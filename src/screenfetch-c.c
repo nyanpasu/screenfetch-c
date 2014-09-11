@@ -1,3 +1,4 @@
+/* TODO Remove preamble and put them in the README */
 /* 	screenfetch-c.c
 	Author: William Woodruff
 	-------------
@@ -53,6 +54,7 @@
 #include "thread.h" /* for cross-platform threading */
 
 /* string definitions - set to Unknown by default */
+/* Move string definitions to a struct */
 static char distro_str[MAX_STRLEN] = "Unknown";
 static char arch_str[MAX_STRLEN] = "Unknown";
 static char host_str[MAX_STRLEN] = "Unknown";
@@ -71,8 +73,8 @@ static char wm_theme_str[MAX_STRLEN] = "Unknown";
 static char gtk_str[MAX_STRLEN] = "Unknown";
 
 /* output string definitions */
-static char* detected_arr[16] = {host_str, distro_str, kernel_str, arch_str, cpu_str, gpu_str, shell_str, pkgs_str, disk_str, mem_str, uptime_str, res_str, de_str, wm_str, wm_theme_str, gtk_str};
-static char* detected_arr_names[16] = {"", "OS: ", "Kernel: ", "Arch: ", "CPU: ", "GPU: ", "Shell: ", "Packages: ", "Disk: ", "Memory: ", "Uptime: ", "Resolution: ", "DE: ", "WM: ", "WM Theme: ", "GTK: "};
+static char* detected_arr[] = {host_str, distro_str, kernel_str, arch_str, cpu_str, gpu_str, shell_str, pkgs_str, disk_str, mem_str, uptime_str, res_str, de_str, wm_str, wm_theme_str, gtk_str};
+static char* detected_arr_names[] = {"", "OS: ", "Kernel: ", "Arch: ", "CPU: ", "GPU: ", "Shell: ", "Packages: ", "Disk: ", "Memory: ", "Uptime: ", "Resolution: ", "DE: ", "WM: ", "WM Theme: ", "GTK: "};
 
 /* other definitions */
 bool manual = false;
@@ -93,6 +95,7 @@ int main(int argc, char** argv)
 
 	struct option long_options[] =
 	{
+		/* TODO Align. */
 		{"manual", no_argument, 0, 'm'},
 		{"verbose", no_argument, 0, 'v'},
 		{"no-logo", no_argument, 0, 'n'},
@@ -105,6 +108,7 @@ int main(int argc, char** argv)
 		{0, 0, 0, 0}
 	};
 
+	/* TOOO Move these characters to the scope of the loop. */
 	signed char c;
 	int index = 0;
 	while ((c = getopt_long(argc, argv, "mvnsD:EVhL:", long_options, &index)) != -1)
@@ -149,6 +153,7 @@ int main(int argc, char** argv)
 		}
 	}
 
+	/* TODO Rewrite how manual mode is handled. */
 	if (manual) /* if the user has decided to enter manual mode */
 	{
 		int stat = manual_input();
@@ -187,13 +192,13 @@ int main(int argc, char** argv)
 			if (STRCMP(gtk_str, "*"))
 				detect_gtk(gtk_str);
 		}
-
 		else /* if the user decided to leave manual mode without input */
 			return EXIT_SUCCESS;
 	}
 
 	else /* each string is filled by its respective function */
 	{
+		/* TODO Remove unneccessary threading. */
 		if (OS != CYGWIN)
 		{
 			THREAD distro_thread;
@@ -295,6 +300,9 @@ int main(int argc, char** argv)
 }
 
 /*  **  BEGIN DETECTION FUNCTIONS  ** */
+/* TODO Move detect functions to their own file. */
+/* NOTE detect_* functions seems to depend on their own platorms...
+ * A better solution would be to put them in platform/<plat>/detect.c */
 
 /*  detect_distro
     detects the computer's distribution (really only relevant on Linux)

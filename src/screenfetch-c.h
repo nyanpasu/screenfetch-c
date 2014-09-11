@@ -21,6 +21,7 @@
 #include <getopt.h>
 
 /* a number is assigned to each OS or OS family */
+/* TODO Use an enum */
 #define UNKNOWN 0
 #define CYGWIN 1
 #define OSX 2
@@ -34,6 +35,9 @@
 /* quick macro for when all BSDs have the same function syntax */
 #define ISBSD() ((OS >= 4 && OS <= 7) ? true : false)
 
+/* TODO Create platform/*.h for each platfor with appropriate
+ * platform functions.
+ */
 #if defined(__CYGWIN__)
 	#define OS CYGWIN
 	extern FILE* popen(const char* command, const char* type);
@@ -97,6 +101,7 @@
 #define KB 1024
 #define MB 1048576
 #define MAX_STRLEN 128
+
 #define SET_DISTRO(str) (safe_strncpy(distro_str, str, MAX_STRLEN))
 #define STRCMP(x, y) (!strcmp(x, y))
 #define FILE_EXISTS(file) (!access(file, F_OK))
@@ -105,6 +110,7 @@
 
 
 /* screenfetch detection function definitions */
+/* TODO Maybe make detect.c and detect.h */
 void detect_distro(char* str);
 void detect_arch(char* str);
 void detect_host(char* str);
@@ -123,6 +129,7 @@ void detect_wm_theme(char* str);
 void detect_gtk(char* str);
 
 /* other function definitions */
+/* TODO Move 'other function definitions' to utils.c */
 int manual_input(void);
 void output_logo_only(char* distro);
 void main_ascii_output(char* data[], char* data_names[]);
@@ -134,6 +141,7 @@ void display_help(void);
 void take_screenshot(void);
 
 /* ** ASCII LOGOS ** */
+/* TODO Move logos into their own file. */
 
 /* 18 */
 char* oldarch_logo[] = 
@@ -1051,5 +1059,3 @@ char* angstrom_logo[] =
 };
 
 #endif /* SCREENFETCH_C_H */
-
-/* EOF */
