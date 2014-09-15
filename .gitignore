@@ -1,6 +1,9 @@
-#ignore bin directory
+# Ignore bin directory
 bin/
 
-#ignore emacs backups
+# Ignore emacs backups
 *~
 .#*
+
+# Ignore YouCompleteMe configurations
+.ycm_extra_conf.py*
