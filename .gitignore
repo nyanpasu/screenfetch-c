@@ -1,4 +1,6 @@
 #ignore bin directory
 bin/
+
 #ignore emacs backups
 *~
+.#*
