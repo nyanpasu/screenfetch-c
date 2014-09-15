@@ -1,4 +1,4 @@
-#include "screenfetch-c.h" /* contains all other includes, function prototypes, macros, ascii logos */
+#include "screenfetch.h" /* contains all other includes, function prototypes, macros, ascii logos */
 #include "thread.h" /* for cross-platform threading */
 
 /* string definitions - set to Unknown by default */
