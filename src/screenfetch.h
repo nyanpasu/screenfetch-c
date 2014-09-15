@@ -93,7 +93,7 @@
 struct char_pair_t {
         const char *title;
         const char *value;
-}
+};
 
 struct screenfetch_t {
         struct char_pair_t distro;
@@ -112,7 +112,7 @@ struct screenfetch_t {
         struct char_pair_t wm;
         struct char_pair_t wm_theme;
         struct char_pair_t gtk;
-}
+};
 
 /* screenfetch detection function definitions */
 /* TODO Maybe make detect.c and detect.h */
