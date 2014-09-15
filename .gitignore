@@ -1,9 +1,13 @@
-# Ignore bin directory
+# Ignore binaires
 bin/
+screenfetch-c
 
 # Ignore emacs backups
 *~
 .#*
+
+# Ignore vim backups
+.*.swp
 
 # Ignore YouCompleteMe configurations
 .ycm_extra_conf.py*
