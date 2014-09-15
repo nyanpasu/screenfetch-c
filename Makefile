@@ -9,7 +9,7 @@ INSTALL=/usr/bin/install -c
 BINDIR=/usr/local/bin
 MANDIR=/usr/local/share/man/man1
 
-SOURCES=screenfetch.c thread.c resources.c
+SOURCES=screenfetch.c thread.c resources.c detect.c
 
 all:
 	@echo '========================================================='
