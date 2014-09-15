@@ -10,22 +10,6 @@
 
 static const char* screenfetch_unknown = "Unknown";
 static const char* detected_arr_names[] = {
-        "",
-        "OS: ",
-        "Kernel: ",
-        "Arch: ",
-        "CPU: ",
-        "GPU: ",
-        "Shell: ",
-        "Packages: ",
-        "Disk: ",
-        "Memory: ",
-        "Uptime: ",
-        "Resolution: ",
-        "DE: ",
-        "WM: ",
-        "WM Theme: ",
-        "GTK: "
 };
 
 /* other definitions */
@@ -35,35 +19,26 @@ bool error = true;
 bool verbose = false;
 bool screenshot = false;
 
-screenfetch_t *
-screenfetch_new()
-{
-        struct screenfetch_t *sf = malloc(sizeof(struct screenfetch_t));
-
-        sf->distro   = screenfetch_unknown;
-        sf->arch     = screenfetch_unknown;
-        sf->host     = screenfetch_unknown;
-        sf->kernel   = screenfetch_unknown;
-        sf->uptime   = screenfetch_unknown;
-        sf->pkgs     = screenfetch_unknown;
-        sf->cpu      = screenfetch_unknown;
-        sf->gpu      = screenfetch_unknown;
-        sf->disk     = screenfetch_unknown;
-        sf->mem      = screenfetch_unknown;
-        sf->shell    = screenfetch_unknown;
-        sf->res      = screenfetch_unknown;
-        sf->de       = screenfetch_unknown;
-        sf->wm       = screenfetch_unknown;
-        sf->wm_theme = screenfetch_unknown;
-        sf->gtk      = screenfetch_unknown;
-
-        return sf;
-}
-
-
 int main(int argc, char** argv)
 {
-        struct screenfetch_t *sf = screenfetch_new();
+        struct screenfetch_t sf = {
+               .distro   = {.title = "OS: "         , .value = screenfetch_unknown},
+               .arch     = {.title = "Arch: "       , .value = screenfetch_unknown},
+               .host     = {.title = "Arch: "       , .value = screenfetch_unknown},
+               .kernel   = {.title = "Kernel: "     , .value = screenfetch_unknown},
+               .uptime   = {.title = "Uptime: "     , .value = screenfetch_unknown},
+               .pkgs     = {.title = "Packages: "   , .value = screenfetch_unknown},
+               .cpu      = {.title = "CPU: "        , .value = screenfetch_unknown},
+               .gpu      = {.title = "GPU: "        , .value = screenfetch_unknown},
+               .disk     = {.title = "Disk: "       , .value = screenfetch_unknown},
+               .mem      = {.title = "Memory: "     , .value = screenfetch_unknown},
+               .shell    = {.title = "Shell: "      , .value = screenfetch_unknown},
+               .res      = {.title = "Resolution: " , .value = screenfetch_unknown},
+               .de       = {.title = "DE: "         , .value = screenfetch_unknown},
+               .wm       = {.title = "WM: "         , .value = screenfetch_unknown},
+               .wm_theme = {.title = "WM Theme: "   , .value = screenfetch_unknown},
+               .gtk      = {.title = "GTK: "        , .value = screenfetch_unknown}
+        };
 
 	/* warn unknown OSes about using this program */
 	if (OS == UNKNOWN)

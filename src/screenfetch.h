@@ -90,23 +90,28 @@
 #define ERROR_OUT(str1, str2) (fprintf(stderr, TWHT "[[ " TLRD "!" TWHT " ]] " TNRM "%s%s\n", str1, str2))
 #define VERBOSE_OUT(str1, str2) (fprintf(stdout, TLRD ":: " TNRM "%s%s\n", str1, str2))
 
+struct char_pair_t {
+        const char *title;
+        const char *value;
+}
+
 struct screenfetch_t {
-        const char *distro;
-        const char *arch;
-        const char *host;
-        const char *kernel;
-        const char *uptime;
-        const char *pkgs;
-        const char *cpu;
-        const char *gpu;
-        const char *disk;
-        const char *mem;
-        const char *shell;
-        const char *res;
-        const char *de;
-        const char *wm;
-        const char *wm_theme;
-        const char *gtk;
+        struct char_pair_t distro;
+        struct char_pair_t arch;
+        struct char_pair_t host;
+        struct char_pair_t kernel;
+        struct char_pair_t uptime;
+        struct char_pair_t pkgs;
+        struct char_pair_t cpu;
+        struct char_pair_t gpu;
+        struct char_pair_t disk;
+        struct char_pair_t mem;
+        struct char_pair_t shell;
+        struct char_pair_t res;
+        struct char_pair_t de;
+        struct char_pair_t wm;
+        struct char_pair_t wm_theme;
+        struct char_pair_t gtk;
 }
 
 /* screenfetch detection function definitions */
@@ -127,8 +132,6 @@ void detect_de(char* str);
 void detect_wm(char* str);
 void detect_wm_theme(char* str);
 void detect_gtk(char* str);
-
-screenfetch_t *screenfetch_new();
 
 /* other function definitions */
 /* TODO Move 'other function definitions' to utils.c */
