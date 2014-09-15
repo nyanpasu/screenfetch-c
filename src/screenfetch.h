@@ -3,13 +3,6 @@
 
 #define _POSIX_C_SOURCE 200112L /* makes all these systems play nicely together */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-#include <unistd.h>
-#include <getopt.h>
-
 /* TODO Use an enum */
 #define UNKNOWN 0
 #define CYGWIN 1
@@ -88,7 +81,7 @@
 
 /* other definitions, use with caution (not type safe) */
 #define KB 1024
-#define MB 1048576
+#define MB KB*KB
 #define MAX_STRLEN 128
 
 #define SET_DISTRO(str) (safe_strncpy(distro_str, str, MAX_STRLEN))
@@ -96,6 +89,25 @@
 #define FILE_EXISTS(file) (!access(file, F_OK))
 #define ERROR_OUT(str1, str2) (fprintf(stderr, TWHT "[[ " TLRD "!" TWHT " ]] " TNRM "%s%s\n", str1, str2))
 #define VERBOSE_OUT(str1, str2) (fprintf(stdout, TLRD ":: " TNRM "%s%s\n", str1, str2))
+
+struct screenfetch_t {
+        const char *distro;
+        const char *arch;
+        const char *host;
+        const char *kernel;
+        const char *uptime;
+        const char *pkgs;
+        const char *cpu;
+        const char *gpu;
+        const char *disk;
+        const char *mem;
+        const char *shell;
+        const char *res;
+        const char *de;
+        const char *wm;
+        const char *wm_theme;
+        const char *gtk;
+}
 
 /* screenfetch detection function definitions */
 /* TODO Maybe make detect.c and detect.h */
@@ -115,6 +127,8 @@ void detect_de(char* str);
 void detect_wm(char* str);
 void detect_wm_theme(char* str);
 void detect_gtk(char* str);
+
+screenfetch_t *screenfetch_new();
 
 /* other function definitions */
 /* TODO Move 'other function definitions' to utils.c */

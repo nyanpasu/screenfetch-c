@@ -1,28 +1,32 @@
-#include "screenfetch.h" /* contains all other includes, function prototypes, macros, ascii logos */
-#include "thread.h" /* for cross-platform threading */
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+#include <unistd.h>
+#include <getopt.h>
 
-/* string definitions - set to Unknown by default */
-/* Move string definitions to a struct */
-static char distro_str[MAX_STRLEN] = "Unknown";
-static char arch_str[MAX_STRLEN] = "Unknown";
-static char host_str[MAX_STRLEN] = "Unknown";
-static char kernel_str[MAX_STRLEN] = "Unknown";
-static char uptime_str[MAX_STRLEN] = "Unknown";
-static char pkgs_str[MAX_STRLEN] = "Unknown";
-static char cpu_str[MAX_STRLEN] = "Unknown";
-static char gpu_str[MAX_STRLEN] = "Unknown";
-static char disk_str[MAX_STRLEN] = "Unknown";
-static char mem_str[MAX_STRLEN] = "Unknown";
-static char shell_str[MAX_STRLEN] = "Unknown";
-static char res_str[MAX_STRLEN] = "Unknown";
-static char de_str[MAX_STRLEN] = "Unknown";
-static char wm_str[MAX_STRLEN] = "Unknown";
-static char wm_theme_str[MAX_STRLEN] = "Unknown";
-static char gtk_str[MAX_STRLEN] = "Unknown";
+#include "screenfetch.h"
+#include "thread.h"
 
-/* output string definitions */
-static char* detected_arr[] = {host_str, distro_str, kernel_str, arch_str, cpu_str, gpu_str, shell_str, pkgs_str, disk_str, mem_str, uptime_str, res_str, de_str, wm_str, wm_theme_str, gtk_str};
-static char* detected_arr_names[] = {"", "OS: ", "Kernel: ", "Arch: ", "CPU: ", "GPU: ", "Shell: ", "Packages: ", "Disk: ", "Memory: ", "Uptime: ", "Resolution: ", "DE: ", "WM: ", "WM Theme: ", "GTK: "};
+static const char* screenfetch_unknown = "Unknown";
+static const char* detected_arr_names[] = {
+        "",
+        "OS: ",
+        "Kernel: ",
+        "Arch: ",
+        "CPU: ",
+        "GPU: ",
+        "Shell: ",
+        "Packages: ",
+        "Disk: ",
+        "Memory: ",
+        "Uptime: ",
+        "Resolution: ",
+        "DE: ",
+        "WM: ",
+        "WM Theme: ",
+        "GTK: "
+};
 
 /* other definitions */
 bool manual = false;
@@ -31,8 +35,36 @@ bool error = true;
 bool verbose = false;
 bool screenshot = false;
 
+screenfetch_t *
+screenfetch_new()
+{
+        struct screenfetch_t *sf = malloc(sizeof(struct screenfetch_t));
+
+        sf->distro   = screenfetch_unknown;
+        sf->arch     = screenfetch_unknown;
+        sf->host     = screenfetch_unknown;
+        sf->kernel   = screenfetch_unknown;
+        sf->uptime   = screenfetch_unknown;
+        sf->pkgs     = screenfetch_unknown;
+        sf->cpu      = screenfetch_unknown;
+        sf->gpu      = screenfetch_unknown;
+        sf->disk     = screenfetch_unknown;
+        sf->mem      = screenfetch_unknown;
+        sf->shell    = screenfetch_unknown;
+        sf->res      = screenfetch_unknown;
+        sf->de       = screenfetch_unknown;
+        sf->wm       = screenfetch_unknown;
+        sf->wm_theme = screenfetch_unknown;
+        sf->gtk      = screenfetch_unknown;
+
+        return sf;
+}
+
+
 int main(int argc, char** argv)
 {
+        struct screenfetch_t *sf = screenfetch_new();
+
 	/* warn unknown OSes about using this program */
 	if (OS == UNKNOWN)
 	{
@@ -101,140 +133,58 @@ int main(int argc, char** argv)
 		}
 	}
 
-	/* TODO Rewrite how manual mode is handled. */
-	if (manual) /* if the user has decided to enter manual mode */
+        /* TODO Rewrite how manual mode is handled. */
+        if (manual) /* if the user has decided to enter manual mode */
+        {
+                int stat = manual_input();
+
+                if (stat == EXIT_SUCCESS)
+                {
+                        /* these sections are ALWAYS detected */
+                        detect_uptime (sf->uptime);
+                        detect_pkgs   (sf->pkgs);
+                        detect_disk   (sf->disk);
+                        detect_mem    (sf->mem);
+
+                        /* if the user specifies an asterisk, fill the data in for them */
+                        // FIXME Just get rid of this altogether. Using a macro for now.
+#define AUTO_DETECT(detector, target) if (STRCMP((target), "*")) detector((target))
+                        AUTO_DETECT(detect_distro   , sf->distro);
+                        AUTO_DETECT(detect_arch     , sf->arch);
+                        AUTO_DETECT(detect_host     , sf->host);
+                        AUTO_DETECT(detect_kernel   , sf->kernel);
+                        AUTO_DETECT(detect_cpu      , sf->cpu);
+                        AUTO_DETECT(detect_gpu      , sf->gpu);
+                        AUTO_DETECT(detect_shell    , sf->shell);
+                        AUTO_DETECT(detect_res      , sf->res);
+                        AUTO_DETECT(detect_de       , sf->de);
+                        AUTO_DETECT(detect_wm       , sf->wm);
+                        AUTO_DETECT(detect_wm_theme , sf->wm_theme);
+                        AUTO_DETECT(detect_gtk      , sf->gtk);
+                }
+                else /* if the user decided to leave manual mode without input */
+                        return EXIT_SUCCESS;
+        }
+
+	else
 	{
-		int stat = manual_input();
-
-		if (stat == EXIT_SUCCESS)
-		{
-			/* these sections are ALWAYS detected */
-			detect_uptime(uptime_str);
-			detect_pkgs(pkgs_str);
-			detect_disk(disk_str);
-			detect_mem(mem_str);
-
-			/* if the user specifies an asterisk, fill the data in for them */
-			if (STRCMP(distro_str, "*"))
-				detect_distro(distro_str);
-			if (STRCMP(arch_str, "*"))
-				detect_arch(arch_str);
-			if (STRCMP(host_str, "*"))
-				detect_host(host_str);
-			if (STRCMP(kernel_str, "*"))
-				detect_kernel(kernel_str);
-			if (STRCMP(cpu_str, "*"))
-				detect_cpu(cpu_str);
-			if (STRCMP(gpu_str, "*"))
-				detect_gpu(gpu_str);
-			if (STRCMP(shell_str, "*"))
-				detect_shell(shell_str);
-			if (STRCMP(res_str, "*"))
-				detect_res(res_str);
-			if (STRCMP(de_str, "*"))
-				detect_de(de_str);
-			if (STRCMP(wm_str, "*"))
-				detect_wm(wm_str);
-			if (STRCMP(wm_theme_str, "*"))
-				detect_wm_theme(wm_theme_str);
-			if (STRCMP(gtk_str, "*"))
-				detect_gtk(gtk_str);
-		}
-		else /* if the user decided to leave manual mode without input */
-			return EXIT_SUCCESS;
-	}
-
-	else /* each string is filled by its respective function */
-	{
-		/* TODO Remove unneccessary threading. */
-		if (OS != CYGWIN)
-		{
-			THREAD distro_thread;
-			create_thread(&distro_thread, (void*) detect_distro, (void*) distro_str);
-			join_thread(distro_thread); /* a few other functions rely on distro_str, so join the thread detect_distro completes */
-
-			THREAD arch_thread;
-			create_thread(&arch_thread, (void*) detect_arch, (void*) arch_str);
-
-			THREAD host_thread;
-			create_thread(&host_thread, (void*) detect_host, (void*) host_str);
-
-			THREAD kernel_thread;
-			create_thread(&kernel_thread, (void*) detect_kernel, (void*) kernel_str);
-
-			THREAD uptime_thread;
-			create_thread(&uptime_thread, (void*) detect_uptime, (void*) uptime_str);
-
-			THREAD pkgs_thread;
-			create_thread(&pkgs_thread, (void*) detect_pkgs, (void*) pkgs_str);
-
-			THREAD cpu_thread;
-			create_thread(&cpu_thread, (void*) detect_cpu, (void*) cpu_str);
-
-			THREAD gpu_thread;
-			create_thread(&gpu_thread, (void*) detect_gpu, (void*) gpu_str);
-
-			THREAD disk_thread;
-			create_thread(&disk_thread, (void*) detect_disk, (void*) disk_str);
-
-			THREAD mem_thread;
-			create_thread(&mem_thread, (void*) detect_mem, (void*) mem_str);
-
-			THREAD shell_thread;
-			create_thread(&shell_thread, (void*) detect_shell, (void*) shell_str);
-
-			THREAD res_thread;
-			create_thread(&res_thread, (void*) detect_res, (void*) res_str);
-
-			THREAD de_thread;
-			create_thread(&de_thread, (void*) detect_de, (void*) de_str);
-
-			THREAD wm_thread;
-			create_thread(&wm_thread, (void*) detect_wm, (void*) wm_str);
-
-			THREAD wm_theme_thread;
-			create_thread(&wm_theme_thread, (void*) detect_wm_theme, (void*) wm_theme_str);
-
-			THREAD gtk_thread;
-			create_thread(&gtk_thread, (void*) detect_gtk, (void*) gtk_str);
-
-			join_thread(arch_thread);
-			join_thread(host_thread);
-			join_thread(kernel_thread);
-			join_thread(uptime_thread);
-			join_thread(pkgs_thread);
-			join_thread(cpu_thread);
-			join_thread(gpu_thread);
-			join_thread(disk_thread);
-			join_thread(mem_thread);
-			join_thread(shell_thread);
-			join_thread(res_thread);
-			join_thread(de_thread);
-			join_thread(wm_thread);
-			join_thread(wm_theme_thread);
-			join_thread(gtk_thread);
-		}
-
-		else /* i haven't perfected threading on windows yet, so don't change this conditional */
-		{
-			detect_distro(distro_str);
-			detect_arch(arch_str);
-			detect_host(host_str);
-			detect_kernel(kernel_str);
-			detect_uptime(uptime_str);
-			detect_pkgs(pkgs_str);
-			detect_cpu(cpu_str);
-			detect_gpu(gpu_str);
-			detect_disk(disk_str);
-			detect_mem(mem_str);
-			detect_shell(shell_str);
-			detect_res(res_str);
-			detect_de(de_str);
-			detect_wm(wm_str);
-			detect_wm_theme(wm_theme_str);
-			detect_gtk(gtk_str);
-		}
-	}
+                detect_distro   (sf->distro);
+                detect_arch     (sf->arch);
+                detect_host     (sf->host);
+                detect_kernel   (sf->kernel);
+                detect_uptime   (sf->uptime);
+                detect_pkgs     (sf->pkgs);
+                detect_cpu      (sf->cpu);
+                detect_gpu      (sf->gpu);
+                detect_disk     (sf->disk);
+                detect_mem      (sf->mem);
+                detect_shell    (sf->shell);
+                detect_res      (sf->res);
+                detect_de       (sf->de);
+                detect_wm       (sf->wm);
+                detect_wm_theme (sf->wm_theme);
+                detect_gtk      (sf->gtk);
+        }
 
 	if (logo)
 		main_ascii_output(detected_arr, detected_arr_names);
