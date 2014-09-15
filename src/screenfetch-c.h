@@ -1,12 +1,3 @@
-/*  screenfetch-c.h
-	Author: William Woodruff
-	-------------
-	
-	The functions, macros, and ascii logos used in screenfetch-c.c are defined/prototyped here.
-	Like the rest of screenfetch-c.c, this file is licensed under the MIT license.
-	You should have received a copy of it with this code.
-*/
-
 #ifndef SCREENFETCH_C_H
 #define SCREENFETCH_C_H
 

@@ -1,12 +1,26 @@
 screenfetch-c
 =============
+Author: William Woodruff
+Author: nyanpasu
 
-## Current Version: 1.2 release 
+A rewrite of screenFetch.sh in C.  This is primarily an experiment
+borne out of an awareness of the slow execution time on the
+screenfetch-dev.sh script.  Hopefully this port will execute faster,
+although it's more for self education than anything else.  Like the
+original screenFetch, screenfetch-c is meant to be compatible with a
+number of systems, including *BSD, GNU/Linux, OS X, and Windows (via
+the Cygwin environment).
 
-screenfetch-c is an attempt to rewrite screenFetch, a popular shell 
-script that displays system information and an ASCII logo, in the C 
-language.
-Like the original screenFetch, screenfetch-c is meant to be compatible with a number of systems, including *BSD, GNU/Linux, OS X, and Windows (via the Cygwin environment).
+NOTES:
+I used many of Brett Bohnenkamper's awk/sed/grep/etc oneliners in my
+popen() calls, although some were modified to change/improve the
+output.  Many thanks to him for discovering bugs and formatting issues
+as well.
+
+The shell scripts detectwm.sh, detectwmtheme.sh, and detectde.sh are
+all partially or completely based upon screenfetch-dev. They are
+called within the program, as detecting the WM/WM theme/DE/GTK within
+C would be a pain in the ass.
 
 ## Installing screenfetch-c:
 
