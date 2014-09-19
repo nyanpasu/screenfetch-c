@@ -63,6 +63,7 @@ static const char* screenfetch_unknown = "Unknown";
 
 int main(int argc, char** argv)
 {
+        /* Set up */
         struct screenfetch_t sf = {
                 .distro   = {.title = "OS: "         , .value = screenfetch_unknown},
                 .arch     = {.title = "Arch: "       , .value = screenfetch_unknown},
@@ -97,9 +98,7 @@ int main(int argc, char** argv)
                 NULL
         };
 
-        /* TOOO Move these characters to the scope of the loop. */
-        signed char c;
-        int index = 0;
+        signed char c; int index = 0;
         while ((c = getopt_long(argc, argv, "mvnsD:EVhL:", sf_options, &index)) != -1)
         {
                 switch (c)
@@ -142,51 +141,23 @@ int main(int argc, char** argv)
                 }
         }
 
-        /* TODO Rewrite how manual mode is handled. */
-        if (manual) /* if the user has decided to enter manual mode */
-        {
+        /* Program */
+
+        detect_uptime (sf->uptime);
+        detect_pkgs   (sf->pkgs);
+        detect_disk   (sf->disk);
+        detect_mem    (sf->mem);
+
+        if (manual)
                 int stat = manual_input();
-
-                if (stat == EXIT_SUCCESS)
-                {
-                        /* these sections are ALWAYS detected */
-                        detect_uptime (sf->uptime);
-                        detect_pkgs   (sf->pkgs);
-                        detect_disk   (sf->disk);
-                        detect_mem    (sf->mem);
-
-                        /* if the user specifies an asterisk, fill the data in for them */
-                        // FIXME Just get rid of this altogether. Using a macro for now.
-#define AUTO_DETECT(detector, target) if (STRCMP((target), "*")) detector((target))
-                        AUTO_DETECT(detect_distro   , sf->distro);
-                        AUTO_DETECT(detect_arch     , sf->arch);
-                        AUTO_DETECT(detect_host     , sf->host);
-                        AUTO_DETECT(detect_kernel   , sf->kernel);
-                        AUTO_DETECT(detect_cpu      , sf->cpu);
-                        AUTO_DETECT(detect_gpu      , sf->gpu);
-                        AUTO_DETECT(detect_shell    , sf->shell);
-                        AUTO_DETECT(detect_res      , sf->res);
-                        AUTO_DETECT(detect_de       , sf->de);
-                        AUTO_DETECT(detect_wm       , sf->wm);
-                        AUTO_DETECT(detect_wm_theme , sf->wm_theme);
-                        AUTO_DETECT(detect_gtk      , sf->gtk);
-                }
-                else /* if the user decided to leave manual mode without input */
-                        return EXIT_SUCCESS;
-        }
-
         else
         {
                 detect_distro   (sf->distro);
                 detect_arch     (sf->arch);
                 detect_host     (sf->host);
                 detect_kernel   (sf->kernel);
-                detect_uptime   (sf->uptime);
-                detect_pkgs     (sf->pkgs);
                 detect_cpu      (sf->cpu);
                 detect_gpu      (sf->gpu);
-                detect_disk     (sf->disk);
-                detect_mem      (sf->mem);
                 detect_shell    (sf->shell);
                 detect_res      (sf->res);
                 detect_de       (sf->de);
@@ -203,7 +174,6 @@ int main(int argc, char** argv)
         if (screenshot)
                 take_screenshot();
 
-        return EXIT_SUCCESS;
 }
 
 /*  main_text_output
@@ -472,6 +442,20 @@ int manual_input(void)
 
                 return EXIT_SUCCESS;
         }
+
+#define AUTO_DETECT(detector, target) if (STRCMP((target), "*")) detector((target))
+        AUTO_DETECT(detect_distro   , sf->distro);
+        AUTO_DETECT(detect_arch     , sf->arch);
+        AUTO_DETECT(detect_host     , sf->host);
+        AUTO_DETECT(detect_kernel   , sf->kernel);
+        AUTO_DETECT(detect_cpu      , sf->cpu);
+        AUTO_DETECT(detect_gpu      , sf->gpu);
+        AUTO_DETECT(detect_shell    , sf->shell);
+        AUTO_DETECT(detect_res      , sf->res);
+        AUTO_DETECT(detect_de       , sf->de);
+        AUTO_DETECT(detect_wm       , sf->wm);
+        AUTO_DETECT(detect_wm_theme , sf->wm_theme);
+        AUTO_DETECT(detect_gtk      , sf->gtk);
 }
 
 /*  safe_strncpy
