@@ -90,7 +90,7 @@ int main(int argc, char** argv)
                 ERROR_OUT("It is HIGHLY recommended, therefore, that you use manual mode.", "");
         }
 
-        struct option long_options[] =
+        struct option sf_options[] =
         {
                 {"manual"          , no_argument      , 0, 'm'},
                 {"verbose"         , no_argument      , 0, 'v'},
@@ -101,13 +101,14 @@ int main(int argc, char** argv)
                 {"version"         , no_argument      , 0, 'V'},
                 {"help"            , no_argument      , 0, 'h'},
                 {"logo-only"       , required_argument, 0, 'L'},
-                { }
+                { },
+                NULL
         };
 
         /* TOOO Move these characters to the scope of the loop. */
         signed char c;
         int index = 0;
-        while ((c = getopt_long(argc, argv, "mvnsD:EVhL:", long_options, &index)) != -1)
+        while ((c = getopt_long(argc, argv, "mvnsD:EVhL:", sf_options, &index)) != -1)
         {
                 switch (c)
                 {
@@ -133,7 +134,7 @@ int main(int argc, char** argv)
                                 display_version();
                                 return EXIT_SUCCESS;
                         case 'h':
-                                display_help();
+                                display_help(sf_options);
                                 return EXIT_SUCCESS;
                         case 'L':
                                 output_logo_only(optarg);
@@ -230,20 +231,23 @@ void main_text_output(char* data[], char* data_names[])
 void sf_display_version(void)
 {
         printf("%Screenfetch %d.%d.%d\n", SCREENFETCH_VERSION_MAJOR, SCREENFETCH_VERSION_MINOR, SCREENFETCH_VERSION_REVISION);
+
+        printf("%s\n", "Operating Systems currently supported:");
+        printf("%s\n", "Windows (via Cygwin), Linux, *BSD, OS X, and Solaris.");
+        printf("%s\n", "Using screenfetch on an OS not listed above may not work entirely or at all (and is disabled by default).");
+        printf("%s\n", "Please access 'man screenfetch' for in-depth information on compatibility and usage.");
+
         return;
 }
 
-/*  display_help
-    called if the -h flag is tripped, tells the user where to find the manpage
-    */
-void sf_display_help(void)
+void sf_display_help(struct options *o)
 {
-        printf("%s\n", "screenfetch-c");
-        printf("%s\n", "A rewrite of screenFetch, the popular shell script, in C.");
-        printf("%s\n", "Operating Systems currently supported:");
-        printf("%s\n", "Windows (via Cygwin), Linux, *BSD, OS X, and Solaris.");
-        printf("%s\n", "Using screenfetch-c on an OS not listed above may not work entirely or at all (and is disabled by default).");
-        printf("%s\n", "Please access 'man screenfetch' for in-depth information on compatibility and usage.");
+        printf("%s\n", "Usage: screenfetch [OPTION]...");
+        printf("%s\n\n", "Displays formatted system information.");
+        
+        for(struct option *i = o; i != NULL; i++)
+                printf("  -%c, --%s\n", o->val, o->name);
+
         return;
 }
 
