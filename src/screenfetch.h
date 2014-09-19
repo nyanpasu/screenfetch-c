@@ -3,24 +3,6 @@
 
 #define _POSIX_C_SOURCE 200112L /* makes all these systems play nicely together */
 
-/* TODO Use an enum */
-enum distro_t
-{
-	UNKNOWN,
-	CYGWIN,
-	OSX,
-	LINUX,
-	FREEBSD,
-	NETBSD,
-	OPENBSD,
-	DFBSD,
-	SOLARIS
-};
-
-/* quick macro for when all BSDs have the same function syntax */
-#define ISBSD() ((OS >= 4 && OS <= 7) ? true : false)
-
-
 /* color/fmt definitions */
 #define TNRM "\x1B[0m" /* normal */
 #define TBLK "\x1B[30m" /* black */
@@ -50,6 +32,19 @@ enum distro_t
 #define FILE_EXISTS(file) (!access(file, F_OK))
 #define ERROR_OUT(str1, str2) (fprintf(stderr, TWHT "[[ " TLRD "!" TWHT " ]] " TNRM "%s%s\n", str1, str2))
 #define VERBOSE_OUT(str1, str2) (fprintf(stdout, TLRD ":: " TNRM "%s%s\n", str1, str2))
+
+enum distro_t
+{
+	UNKNOWN,
+	CYGWIN,
+	OSX,
+	LINUX,
+	FREEBSD,
+	NETBSD,
+	OPENBSD,
+	DFBSD,
+	SOLARIS
+};
 
 struct char_pair_t {
         const char *title;

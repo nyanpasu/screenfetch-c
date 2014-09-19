@@ -8,49 +8,8 @@
 #include "screenfetch.h"
 #include "detect.h"
 #include "thread.h"
+#include "platform.h"
 #include "version.h"
-
-/* TODO Create platform/*.h for each platfor with appropriate
- * platform functions.
- */
-#if defined(__CYGWIN__)
-	#define OS CYGWIN
-	extern FILE* popen(const char* command, const char* type);
-	extern int pclose(FILE* stream);
-	#define WIN32_LEAN_AND_MEAN
-	#include <Windows.h>
-#elif defined(__APPLE__) && defined(__MACH__)
-	#define OS OSX
-	#include <sys/utsname.h>
-	#include <time.h>
-#elif defined(__linux__)
-	#define OS LINUX
-	#include <sys/sysinfo.h>
-	#include <sys/utsname.h>
-	#include <X11/Xlib.h>
-#elif defined(__FreeBSD__)
-	#define OS FREEBSD
-	#include <time.h>
-#elif defined(__NetBSD__)
-	#define OS NETBSD
-#elif defined(__OpenBSD__)
-	#define OS OPENBSD
-	#include <sys/utsname.h>
-	#include <time.h>
-#elif defined(__DragonFly__)
-	#define OS DFBSD
-	#include <time.h>
-#elif defined(__sun__)
-	#define OS SOLARIS
-	#include <utmpx.h>
-	#include <time.h>
-	#include <sys/types.h>
-	#include <sys/param.h>
-	#include <sys/utsname.h>
-	#include <X11/Xlib.h>
-#else 
-	#define OS UNKNOWN
-#endif
 
 /* other definitions */
 static bool manual = false;
@@ -232,62 +191,40 @@ void sf_take_screenshot(void)
         sleep(1);
         printf("%s\n", "0");
 
-        if (OS == CYGWIN)
-        {
-#ifdef __CYGWIN__
-                /* terrible hack, the printscreen key is simulated */
-                keybd_event(VK_SNAPSHOT, 0, 0, 0);
+        #ifdef PLATFORM_WINDOWS
+        /* terrible hack, the printscreen key is simulated */
+        keybd_event(VK_SNAPSHOT, 0, 0, 0);
 
-                if (verbose)
-                        VERBOSE_OUT("Screenshot has been saved to the clipboard.", "");
+        /* NOT FINSISHED - HBITMAP needs to be saved
+           HDC screen_dc = GetDC(NULL);
+           HDC mem_dc = CreateCompatibleDC(screen_dc);
 
+           int horiz = GetDeviceCaps(screen_dc, HORZRES);
+           int vert = GetDeviceCaps(screen_dc, VERTRES);
 
-                /* NOT FINSISHED - HBITMAP needs to be saved
-                   HDC screen_dc = GetDC(NULL);
-                   HDC mem_dc = CreateCompatibleDC(screen_dc);
+           HBITMAP bitmap = CreateCompatibleBitmap(screen_dc, horiz, vert);
+           HBITMAP old_bitmap = SelectObject(mem_dc, bitmap);
 
-                   int horiz = GetDeviceCaps(screen_dc, HORZRES);
-                   int vert = GetDeviceCaps(screen_dc, VERTRES);
+           BitBlt(mem_dc, 0, 0, horiz, vert, screen_dc, 0, 0, SRCCOPY);
+           bitmap = SelectObject(mem_dc, old_bitmap);
 
-                   HBITMAP bitmap = CreateCompatibleBitmap(screen_dc, horiz, vert);
-                   HBITMAP old_bitmap = SelectObject(mem_dc, bitmap);
-
-                   BitBlt(mem_dc, 0, 0, horiz, vert, screen_dc, 0, 0, SRCCOPY);
-                   bitmap = SelectObject(mem_dc, old_bitmap);
-
-                   DeleteDC(screen_dc);
-                   DeleteDC(mem_dc);
-                   */
-#endif
-        }
-
-        else
-        {
-                if (OS == OSX)
-                {
-                        system("screencapture -x ~/screenfetch_screenshot.png 2> /dev/null");	
-                }
-
-                else if (OS == LINUX || ISBSD())
-                {
-                        system("scrot ~/screenfetch_screenshot.png 2> /dev/null");
-                }
-
-                char* loc = getenv("HOME");
-                strncat(loc, "/screenfetch_screenshot.png", MAX_STRLEN);
-
-                if (FILE_EXISTS(loc) && verbose)
-                {
-                        VERBOSE_OUT("Screenshot successfully saved.", "");
-                }
-
-                else if (verbose)
-
-                        ERROR_OUT("Error: ", "Problem saving screenshot.");
-                }
-        }
+           DeleteDC(screen_dc);
+           DeleteDC(mem_dc);
+        */
 
         return;
+        #else
+        #if defined(PLATFORM_OSX)
+        system("screencapture -x ~/screenfetch_screenshot.png 2> /dev/null");	
+        #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_BSD))
+        system("scrot ~/screenfetch_screenshot.png 2> /dev/null");
+        #endif
+
+        char* loc = getenv("HOME");
+        strncat(loc, "/screenfetch_screenshot.png", MAX_STRLEN);
+
+        return;
+        #endif
 }
 
 /*  manual_input
@@ -306,6 +243,7 @@ int manual_input(struct screenfetch_t sf)
         if (!FILE_EXISTS(config_file_loc))
         {
                 printf("Use * to detect normally.\n");
+
                 config_file = fopen(config_file_loc, "w");
 
                 /* Makes the very bold assumption that all members of screenfetch_t will be char_pair_t */
@@ -383,9 +321,7 @@ void output_logo_only(char* distro)
 {
         // FIXME This is a temporary macro to make it easier to read the ridiculous boilerplate
         #define SF_DISPLAY_LOGO(condition, length, logo) \
-        if (condition) \
-                for (int i = 0; i < length; i++) \
-                        printf("%s\n", logo[i]);
+                if (condition) { for (int i = 0; i < length; i++) { printf("%s\n", logo[i]); } return; }
 
         SF_DISPLAY_LOGO(STRCMP(distro, "Windows"), 16, windows_logo);
         SF_DISPLAY_LOGO(STRCMP(distro, "OS X"), 16, macosx_logo);
