@@ -1,14 +1,15 @@
+#include <getopt.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h>
 #include <unistd.h>
-#include <getopt.h>
 
-#include "screenfetch.h"
 #include "detect.h"
-#include "thread.h"
 #include "platform.h"
+#include "screenfetch.h"
+#include "thread.h"
+#include "utils.h"
 #include "version.h"
 
 /* other definitions */

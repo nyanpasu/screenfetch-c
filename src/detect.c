@@ -1,5 +1,6 @@
 #include "detect.h"
 #include "platform.h"
+#include "utils.h"
 
 /* NOTE detect_* functions seems to depend on their own platorms...
  * A better solution would be to put them in platform/<plat>/detect.c */

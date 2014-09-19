@@ -1,3 +1,5 @@
+#include "utils.h"
+
 /* 18 */
 char* oldarch_logo[] = 
 {
