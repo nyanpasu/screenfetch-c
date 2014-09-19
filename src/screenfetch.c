@@ -65,22 +65,22 @@ int main(int argc, char** argv)
 {
         /* Set up */
         struct screenfetch_t sf = {
-                .distro   = {.title = "OS: "         , .value = screenfetch_unknown},
-                .arch     = {.title = "Arch: "       , .value = screenfetch_unknown},
-                .host     = {.title = "Arch: "       , .value = screenfetch_unknown},
-                .kernel   = {.title = "Kernel: "     , .value = screenfetch_unknown},
-                .uptime   = {.title = "Uptime: "     , .value = screenfetch_unknown},
-                .pkgs     = {.title = "Packages: "   , .value = screenfetch_unknown},
-                .cpu      = {.title = "CPU: "        , .value = screenfetch_unknown},
-                .gpu      = {.title = "GPU: "        , .value = screenfetch_unknown},
-                .disk     = {.title = "Disk: "       , .value = screenfetch_unknown},
-                .mem      = {.title = "Memory: "     , .value = screenfetch_unknown},
-                .shell    = {.title = "Shell: "      , .value = screenfetch_unknown},
-                .res      = {.title = "Resolution: " , .value = screenfetch_unknown},
-                .de       = {.title = "DE: "         , .value = screenfetch_unknown},
-                .wm       = {.title = "WM: "         , .value = screenfetch_unknown},
-                .wm_theme = {.title = "WM Theme: "   , .value = screenfetch_unknown},
-                .gtk      = {.title = "GTK: "        , .value = screenfetch_unknown}
+                .distro   = {.title = "OS"         , .value = screenfetch_unknown},
+                .arch     = {.title = "Arch"       , .value = screenfetch_unknown},
+                .host     = {.title = "Host"       , .value = screenfetch_unknown},
+                .kernel   = {.title = "Kernel"     , .value = screenfetch_unknown},
+                .uptime   = {.title = "Uptime"     , .value = screenfetch_unknown},
+                .pkgs     = {.title = "Packages"   , .value = screenfetch_unknown},
+                .cpu      = {.title = "CPU"        , .value = screenfetch_unknown},
+                .gpu      = {.title = "GPU"        , .value = screenfetch_unknown},
+                .disk     = {.title = "Disk"       , .value = screenfetch_unknown},
+                .mem      = {.title = "Memory"     , .value = screenfetch_unknown},
+                .shell    = {.title = "Shell"      , .value = screenfetch_unknown},
+                .res      = {.title = "Resolution" , .value = screenfetch_unknown},
+                .de       = {.title = "DE"         , .value = screenfetch_unknown},
+                .wm       = {.title = "WM"         , .value = screenfetch_unknown},
+                .wm_theme = {.title = "WM Theme"   , .value = screenfetch_unknown},
+                .gtk      = {.title = "GTK"        , .value = screenfetch_unknown}
         };
 
         struct option sf_options[] =
@@ -143,27 +143,27 @@ int main(int argc, char** argv)
 
         /* Program */
 
-        detect_uptime (sf->uptime);
-        detect_pkgs   (sf->pkgs);
-        detect_disk   (sf->disk);
-        detect_mem    (sf->mem);
+        detect_uptime (sf.uptime);
+        detect_pkgs   (sf.pkgs);
+        detect_disk   (sf.disk);
+        detect_mem    (sf.mem);
 
         if (manual)
                 int stat = manual_input();
         else
         {
-                detect_distro   (sf->distro);
-                detect_arch     (sf->arch);
-                detect_host     (sf->host);
-                detect_kernel   (sf->kernel);
-                detect_cpu      (sf->cpu);
-                detect_gpu      (sf->gpu);
-                detect_shell    (sf->shell);
-                detect_res      (sf->res);
-                detect_de       (sf->de);
-                detect_wm       (sf->wm);
-                detect_wm_theme (sf->wm_theme);
-                detect_gtk      (sf->gtk);
+                detect_distro   (sf.distro);
+                detect_arch     (sf.arch);
+                detect_host     (sf.host);
+                detect_kernel   (sf.kernel);
+                detect_cpu      (sf.cpu);
+                detect_gpu      (sf.gpu);
+                detect_shell    (sf.shell);
+                detect_res      (sf.res);
+                detect_de       (sf.de);
+                detect_wm       (sf.wm);
+                detect_wm_theme (sf.wm_theme);
+                detect_gtk      (sf.gtk);
         }
 
         if (logo)
@@ -292,153 +292,45 @@ void sf_take_screenshot(void)
 
 /*  manual_input
     generates (or reads) the ~/.screenfetchc file based upon user input
-    returns an int indicating status (SUCCESS or FAILURE)
+    returns an int indicating status (EXIT_SUCCESS or EXIT_FAILURE)
     */
-int manual_input(void)
+int manual_input(struct screenfetch_t sf)
 {
         FILE* config_file;
-        char* config_file_loc;
+        char *home = getenv("HOME");
+        char config_file_loc[MAX_STRLEN] = {0};
 
-        config_file_loc = getenv("HOME");
+        strncat(config_file_loc, home, MAX_STRLEN);
         strncat(config_file_loc, "/.screenfetchc", MAX_STRLEN);
 
         if (!FILE_EXISTS(config_file_loc))
         {
-                if (OS == CYGWIN)
+                printf("Use * to detect normally.\n");
+                config_file = fopen(config_file_loc, "w");
+
+                /* Makes the very bold assumption that all members of screenfetch_t will be char_pair_t */
+                struct char_pair_t list[] = (struct char_pair_t *)&sf;
+                
+                for(int i = 0, i < sizeof(struct screenfetch_t)/sizeof(struct char_pair_t); ++i)
                 {
-                        printf("%s\n", TBLU "WARNING: There is currenly a bug involving manual mode on Windows." TNRM);
-                        printf("%s\n", TBLU "Only continue if you are ABSOLUTELY sure." TNRM);
+                        char *line = calloc(MAX_STRLEN, 1);
+                        printf("%s: ", list[i].title);
+                        fgets(line, MAX_STRLEN, stdin);
+                        list[i].value = line;
                 }
 
-                printf("%s\n", "This appears to be your first time running screenfetch-c in manual mode.");
-                printf("%s", "Would you like to continue? (y/n) ");
-
-                char choice = getchar();
-                getchar(); /* flush the newline */
-
-                if (choice == 'y' || choice == 'Y')
-                {
-                        config_file = fopen(config_file_loc, "w");
-
-                        printf("%s\n", "We are now going to begin the manual mode input process.");
-                        printf("%s\n", "Please enter exactly what is asked for.");
-                        printf("%s\n", "If you are unsure about format, please consult the manpage.");
-
-                        printf("%s", "Please enter the name of your distribution/OS: ");
-                        fgets(distro_str, MAX_STRLEN, stdin);
-                        fputs(distro_str, config_file);
-
-                        printf("%s", "Please enter your architecture: ");
-                        fgets(arch_str, MAX_STRLEN, stdin);
-                        fputs(arch_str, config_file);
-
-                        printf("%s", "Please enter your username@hostname: ");
-                        fgets(host_str, MAX_STRLEN, stdin);
-                        fputs(host_str, config_file);
-
-                        printf("%s", "Please enter your kernel: ");
-                        fgets(kernel_str, MAX_STRLEN, stdin);
-                        fputs(kernel_str, config_file);
-
-                        printf("%s", "Please enter your CPU name: ");
-                        fgets(cpu_str, MAX_STRLEN, stdin);
-                        fputs(cpu_str, config_file);
-
-                        printf("%s", "Please enter your GPU name: ");
-                        fgets(gpu_str, MAX_STRLEN, stdin);
-                        fputs(gpu_str, config_file);
-
-                        printf("%s", "Please enter your shell name and version: ");
-                        fgets(shell_str, MAX_STRLEN, stdin);
-                        fputs(shell_str, config_file);
-
-                        printf("%s", "Please enter your monitor resolution: ");
-                        fgets(res_str, MAX_STRLEN, stdin);
-                        fputs(res_str, config_file);
-
-                        printf("%s", "Please enter your DE name: ");
-                        fgets(de_str, MAX_STRLEN, stdin);
-                        fputs(de_str, config_file);
-
-                        printf("%s", "Please enter your WM name: ");
-                        fgets(wm_str, MAX_STRLEN, stdin);
-                        fputs(wm_str, config_file);
-
-                        printf("%s", "Please enter your WM Theme name: ");
-                        fgets(wm_theme_str, MAX_STRLEN, stdin);
-                        fputs(wm_theme_str, config_file);
-
-                        printf("%s", "Please enter any GTK info: ");
-                        fgets(gtk_str, MAX_STRLEN, stdin);
-                        fputs(gtk_str, config_file);
-
-                        printf("%s\n", "That concludes the manual input.");
-                        printf("%s\n", "From now on, screenfetch-c will use this information when called with -m.");
-
-                        fclose(config_file);
-
-                        /* i am deeply ashamed of this solution */
-                        distro_str[strlen(distro_str) - 1] = '\0';
-                        arch_str[strlen(arch_str) - 1] = '\0';
-                        host_str[strlen(host_str) - 1] = '\0';
-                        kernel_str[strlen(kernel_str) - 1] = '\0';
-                        cpu_str[strlen(cpu_str) - 1] = '\0';
-                        gpu_str[strlen(gpu_str) - 1] = '\0';
-                        shell_str[strlen(shell_str) - 1] = '\0';
-                        res_str[strlen(res_str) - 1] = '\0';
-                        de_str[strlen(de_str) - 1] = '\0';
-                        wm_str[strlen(wm_str) - 1] = '\0';
-                        wm_theme_str[strlen(wm_theme_str) - 1] = '\0';
-                        gtk_str[strlen(gtk_str) - 1] = '\0';
-
-                        return EXIT_SUCCESS;
-                }
-
-                else
-                {
-                        printf("%s\n", "Exiting manual mode and screenfetch-c.");
-                        printf("%s\n", "If you wish to run screenfetch-c normally, do not use the -m (--manual) flag next time.");
-
-                        return EXIT_FAILURE;
-                }
-        }
-
-        else
-        {
-                if (verbose)
-                        VERBOSE_OUT("Found config file. Reading...", "");
-
-                config_file = fopen(config_file_loc, "r");
-
-                fgets(distro_str, MAX_STRLEN, config_file);
-                fgets(arch_str, MAX_STRLEN, config_file);
-                fgets(host_str, MAX_STRLEN, config_file);
-                fgets(kernel_str, MAX_STRLEN, config_file);
-                fgets(cpu_str, MAX_STRLEN, config_file);
-                fgets(gpu_str, MAX_STRLEN, config_file);
-                fgets(shell_str, MAX_STRLEN, config_file);
-                fgets(res_str, MAX_STRLEN, config_file);
-                fgets(de_str, MAX_STRLEN, config_file);
-                fgets(wm_str, MAX_STRLEN, config_file);
-                fgets(wm_theme_str, MAX_STRLEN, config_file);
-
-                fgets(gtk_str, MAX_STRLEN, config_file);
+                printf("%s\n", "Saving...");
+                /* TODO Save config. */
 
                 fclose(config_file);
 
-                /* i am deeply ashamed of this solution */
-                distro_str[strlen(distro_str) - 1] = '\0';
-                arch_str[strlen(arch_str) - 1] = '\0';
-                host_str[strlen(host_str) - 1] = '\0';
-                kernel_str[strlen(kernel_str) - 1] = '\0';
-                cpu_str[strlen(cpu_str) - 1] = '\0';
-                gpu_str[strlen(gpu_str) - 1] = '\0';
-                shell_str[strlen(shell_str) - 1] = '\0';
-                res_str[strlen(res_str) - 1] = '\0';
-                de_str[strlen(de_str) - 1] = '\0';
-                wm_str[strlen(wm_str) - 1] = '\0';
-                wm_theme_str[strlen(wm_theme_str) - 1] = '\0';
-                gtk_str[strlen(gtk_str) - 1] = '\0';
+                return EXIT_SUCCESS;
+        } else
+        {
+                config_file = fopen(config_file_loc, "r");
+
+                /* TODO Parse config. */
+                fclose(config_file);
 
                 return EXIT_SUCCESS;
         }
