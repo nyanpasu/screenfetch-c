@@ -82,14 +82,6 @@ int main(int argc, char** argv)
                 .gtk      = {.title = "GTK: "        , .value = screenfetch_unknown}
         };
 
-        /* warn unknown OSes about using this program */
-        if (OS == UNKNOWN)
-        {
-                ERROR_OUT("Warning: ", "This program isn't designed for your OS.");
-                ERROR_OUT("Even if it did compile successfully, it will not execute correctly.", "");
-                ERROR_OUT("It is HIGHLY recommended, therefore, that you use manual mode.", "");
-        }
-
         struct option sf_options[] =
         {
                 {"manual"          , no_argument      , 0, 'm'},
