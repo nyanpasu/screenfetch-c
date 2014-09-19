@@ -180,7 +180,7 @@ void detect_arch(char* str)
         {
                 safe_strncpy(str, "Unknown", MAX_STRLEN);
         }
-#elif defined(PLATFORM_LINUX) || defined(PLATFORM_OSX)) || defined(PLATFORM_SOLARIS)
+#elif defined(PLATFORM_LINUX) || defined(PLATFORM_OSX) || defined(PLATFORM_SOLARIS)
         struct utsname arch_info;
         uname(&arch_info);
         safe_strncpy(str, arch_info.machine, MAX_STRLEN);
@@ -216,7 +216,7 @@ void detect_host(char* str)
         gethostname(given_host, MAX_STRLEN);
 
         free(given_user);
-#elif defined(PLATFORM_LINUX) || defined(PLATFORM_OSX)) || defined(PLATFORM_SOLARIS)
+#elif defined(PLATFORM_LINUX) || defined(PLATFORM_OSX) || defined(PLATFORM_SOLARIS)
         given_user = getlogin(); /* getlogin is apparently buggy on linux, so this might be changed */
         gethostname(given_host, MAX_STRLEN);
 #elif defined(PLATFORM_BSD) 
@@ -252,7 +252,7 @@ void detect_kernel(char* str)
                 fscanf(kernel_file, "%s", str);
 
         pclose(kernel_file);
-#elif defined(PLATFORM_LINUX) || defined(PLATFORM_OSX)) || defined(PLATFORM_SOLARIS)
+#elif defined(PLATFORM_LINUX) || defined(PLATFORM_OSX) || defined(PLATFORM_SOLARIS)
         struct utsname kern_info;
         uname(&kern_info);
 #endif
@@ -348,7 +348,7 @@ void detect_pkgs(char* str)
 
         int packages = 0;
 
-#ifdef defined(PLATFORM_WINDOWS)
+#if defined(PLATFORM_WINDOWS)
         pkgs_file = popen("cygcheck -cd | wc -l", "r");
         fscanf(pkgs_file, "%d", &packages);
         packages -= 2;
@@ -356,7 +356,7 @@ void detect_pkgs(char* str)
 
         snprintf(str, MAX_STRLEN, "%d", packages);
 
-#ifdef defined(PLATFORM_OSX)
+#elif defined(PLATFORM_OSX)
         pkgs_file = popen("ls /usr/local/bin 2> /dev/null | wc -w", "r");
         fscanf(pkgs_file, "%d", &packages);
         pclose(pkgs_file);
@@ -652,8 +652,6 @@ void detect_mem(char* str)
         /* known problem: because linux utilizes free ram extensively in caches/buffers,
            the amount of memory sysinfo reports as free is very small.
            */
-
-#if defined(__linux__)
         struct sysinfo si_mem;
         sysinfo(&si_mem);
 
@@ -763,7 +761,6 @@ void detect_res(char* str)
         width = GetSystemMetrics(SM_CXVIRTUALSCREEN);
         height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
         snprintf(str, MAX_STRLEN, "%dx%d", width, height);
-#endif
 
 #elif defined(PLATFORM_OSX)
         res_file = popen("system_profiler SPDisplaysDataType | awk '/Resolution:/ {print $2\"x\"$4}' | tr -d '\\n'", "r");
@@ -797,6 +794,8 @@ void detect_res(char* str)
                 safe_strncpy(str, "No X Server", MAX_STRLEN);
         }
 
+#endif
+
         if (verbose)
                 VERBOSE_OUT("Found resolution as ", str);
 }
@@ -813,7 +812,7 @@ void detect_de(char* str)
 {
         FILE* de_file;
 
-#ifdef defined(PLATFORM_WINDOWS)
+#if defined(PLATFORM_WINDOWS)
         int version;
 
         de_file = popen("wmic os get version | grep -o '^[0-9]'", "r");
@@ -839,6 +838,7 @@ void detect_de(char* str)
 
 #elif defined(PLATFORM_SOLARIS)
         /* detectde needs to be made compatible with Solaris's AWK */
+#endif
 
         if (verbose)
                 VERBOSE_OUT("Found DE as ", str);
@@ -856,7 +856,7 @@ void detect_wm(char* str)
 {
         FILE* wm_file;
 
-#ifdef defined(PLATFORM_WINDOWS)
+#if defined(PLATFORM_WINDOWS)
         /* wm_file = popen("tasklist | grep -o 'bugn' | tr -d '\\r\\n'", "r"); */
         /* test for bugn */
         /* pclose(wm_file); */
