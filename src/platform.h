@@ -16,9 +16,6 @@
 	#include <sys/sysinfo.h>
 	#include <sys/utsname.h>
 	#include <X11/Xlib.h>
-#elif defined(__DragonFly__)
-	#define PLATFORM_DRAGONFLY
-	#include <time.h>
 #elif defined(__sun__)
 	#define PLATOFRM_SOLARIS
 	#include <utmpx.h>
@@ -27,6 +24,10 @@
 	#include <sys/param.h>
 	#include <sys/utsname.h>
 	#include <X11/Xlib.h>
+#elif defined(__DragonFly__)
+	#define PLATFORM_BSD
+	#define BSD_DRAGONFLY
+	#include <time.h>
 #elif defined(__FreeBSD__)
 	#define PLATFORM_BSD
 	#define BSD_FREE
