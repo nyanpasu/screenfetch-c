@@ -1,14 +1,10 @@
+/* NOTE detect_* functions seems to depend on their own platorms...
+ * A better solution would be to put them in platform/<plat>/detect.c */
+
 #include "detect.h"
 #include "platform.h"
 #include "utils.h"
 
-/* NOTE detect_* functions seems to depend on their own platorms...
- * A better solution would be to put them in platform/<plat>/detect.c */
-
-/*  detect_distro
-    detects the computer's distribution (really only relevant on Linux)
-    argument char* str: the char array to be filled with the distro name
-    */
 void detect_distro(char* str)
 {
         if (STRCMP(str, "Unknown") || STRCMP(str, "*")) /* if distro_str was NOT set by the -D flag or manual mode */
@@ -144,10 +140,6 @@ void detect_distro(char* str)
                 VERBOSE_OUT("Found distro as ", str);
 }
 
-/*  detect_arch
-    detects the computer's architecture
-    argument char* str: the char array to be filled with the architecture
-    */
 void detect_arch(char* str)
 {
         FILE* arch_file;
@@ -191,13 +183,7 @@ void detect_arch(char* str)
 #endif
 }
 
-/*  detect_host
-    detects the computer's hostname and active user and formats them
-    argument char* str: the char array to be filled with the user and hostname in format 'user@host'
-    --
-CAVEAT: acceses an environment variable
---
-*/
+/* NOTE Accesses environment variable */
 void detect_host(char* str)
 {
         char* given_user = "Unknown"; /* has to be a pointer for getenv()/GetUserName(), god knows why */
@@ -230,10 +216,6 @@ void detect_host(char* str)
         snprintf(str, MAX_STRLEN, "%s@%s", given_user, given_host);
 }
 
-/*  detect_kernel
-    detects the computer's kernel
-    argument char* str: the char array to be filled with the kernel name
-    */
 // TODO Double check macros
 void detect_kernel(char* str)
 {
@@ -246,24 +228,15 @@ void detect_kernel(char* str)
 #elif defined(PLATFORM_BSD) 
         FILE* kernel_file = popen("uname -sr | tr -d '\\n'", "r");
 
-        if (OS != CYGWIN)
-                fgets(str, MAX_STRLEN, kernel_file);
-        else
-                fscanf(kernel_file, "%s", str);
+        fscanf(kernel_file, "%s", str);
 
         pclose(kernel_file);
 #elif defined(PLATFORM_LINUX) || defined(PLATFORM_OSX) || defined(PLATFORM_SOLARIS)
         struct utsname kern_info;
         uname(&kern_info);
 #endif
-
-        snprintf(str, MAX_STRLEN, "%s %s", kern_info.sysname, kern_info.release);
 }
 
-/*  detect_uptime
-    detects the computer's uptime
-    argument char* str: the char array to be filled with the uptime in format '$d $h $m $s' where $ is a number
-    */
 // TODO Double check macros
 void detect_uptime(char* str)
 {
@@ -337,10 +310,6 @@ void detect_uptime(char* str)
         return;
 }
 
-/*  detect_pkgs
-    detects the number of packages installed on the computer
-    argument char* str: the char array to be filled with the number of packages
-    */
 // NOTE relies on distro_str or something to be defined first
 void detect_pkgs(char* str)
 {
@@ -473,10 +442,6 @@ void detect_pkgs(char* str)
                 VERBOSE_OUT("Found package count as ", str);
 }
 
-/*  detect_cpu
-    detects the computer's CPU brand/name-string
-    argument char* str: the char array to be filled with the CPU name
-    */
 // TODO Double check macros
 void detect_cpu(char* str)
 {
@@ -518,15 +483,11 @@ void detect_cpu(char* str)
                 VERBOSE_OUT("Found CPU as ", str);
 }
 
-/*  detect_gpu
-    detects the computer's GPU brand/name-string
-    argument char* str: the char array to be filled with the GPU name
-    */
 void detect_gpu(char* str)
 {
         FILE* gpu_file;
 
-#ifdef PLATFORM_CYGWIN
+#ifdef PLATFORM_WINDOWS
         HKEY hkey;
         DWORD str_size = MAX_STRLEN;
         RegOpenKey(HKEY_LOCAL_MACHINE, "SYSTEM\\ControlSet001\\Control\\Class\\{4D36E968-E325-11CE-BFC1-08002BE10318}\\0000\\Settings", &hkey);
@@ -547,10 +508,6 @@ void detect_gpu(char* str)
                 VERBOSE_OUT("Found GPU as ", str);
 }
 
-/*  detect_disk
-    detects the computer's total disk capacity and usage
-    argument char* str: the char array to be filled with the disk data in format '$G / $G ($G%)', where $ is a number
-    */
 void detect_disk(char* str)
 {
         FILE* disk_file;
@@ -612,10 +569,7 @@ void detect_disk(char* str)
                 VERBOSE_OUT("Found disk usage as ", str);
 }
 
-/*  detect_mem
-    detects the computer's total and used RAM
-    argument char* str: the char array to be filled with the memory data in format '$MB / $MB', where $ is a number
-    */
+/* Uses format 'nMB / nMB', where n is a number */
 void detect_mem(char* str)
 {
         FILE* mem_file;
@@ -680,15 +634,9 @@ void detect_mem(char* str)
 #endif
 }
 
-/*  detect_shell
-    detects the shell currently running on the computer
-    argument char* str: the char array to be filled with the shell name and version
-    --
-CAVEAT: shell version detection relies on the standard versioning format for 
-each shell. If any shell's older (or newer versions) suddenly begin to use a new
-scheme, the version may be displayed incorrectly.
---
-*/
+/* CAVEAT: shell version detection relies on the standard versioning format for
+ * each shell. If any shell's older (or newer versions) suddenly begin to use a
+ * new scheme, the version may be displayed incorrectly.  */
 void detect_shell(char* str)
 {
         FILE* shell_file;
@@ -746,10 +694,6 @@ void detect_shell(char* str)
                 VERBOSE_OUT("Found shell as ", str);
 }
 
-/*  detect_res
-    detects the combined resolution of all monitors attached to the computer
-    argument char* str: the char array to be filled with the resolution in format '$x$', where $ is a number
-    */
 void detect_res(char* str)
 {
         FILE* res_file;
@@ -800,14 +744,9 @@ void detect_res(char* str)
                 VERBOSE_OUT("Found resolution as ", str);
 }
 
-/*  detect_de
-    detects the desktop environment currently running on top of the OS
-    argument char* str: the char array to be filled with the DE name
-    --
-CAVEAT: On *BSDs and Linux distros, this function relies on the presence of 
-'detectde', a shell script. If it isn't present in the working directory, the DE will be set as 'Unknown'
---
-*/
+/*  CAVEAT: On *BSDs and Linux distros, this function relies on the presence of
+ *  'detectde', a shell script. If it isn't present in the working directory,
+ *  the DE will be set as 'Unknown' */
 void detect_de(char* str)
 {
         FILE* de_file;
@@ -844,14 +783,9 @@ void detect_de(char* str)
                 VERBOSE_OUT("Found DE as ", str);
 }
 
-/*  detect_wm
-    detects the window manager currently running on top of the OS
-    argument char* str: the char array to be filled with the WM name
-    --
-CAVEAT: On *BSDs and Linux distros, this function relies on the presence of 
-'detectwm', a shell script. If it isn't present in the working directory, the WM will be set as 'Unknown'
---
-*/
+/* CAVEAT: On *BSDs and Linux distros, this function relies on the presence of
+ * 'detectwm', a shell script. If it isn't present in the working directory,
+ * the WM will be set as 'Unknown' */
 void detect_wm(char* str)
 {
         FILE* wm_file;
@@ -881,14 +815,9 @@ void detect_wm(char* str)
                 VERBOSE_OUT("Found WM as ", str);
 }
 
-/*  detect_wm_theme
-    detects the theme associated with the WM detected in detect_wm()
-    argument char* str: the char array to be filled with the WM Theme name
-    --
-CAVEAT: On *BSDs and Linux distros, this function relies on the presence of 
-'detectwmtheme', a shell script. If it isn't present in the working directory, the WM Theme will be set as 'Unknown'
---
-*/
+/* CAVEAT: On *BSDs and Linux distros, this function relies on the presence of
+ * 'detectwmtheme', a shell script. If it isn't present in the working
+ * directory, the WM Theme will be set as 'Unknown' */
 void detect_wm_theme(char* str)
 {
         FILE* wm_theme_file;
@@ -912,14 +841,10 @@ void detect_wm_theme(char* str)
                 VERBOSE_OUT("Found WM theme as ", str);
 }
 
-/*  detect_gtk
-    detects the theme, icon(s), and font(s) associated with a GTK DE (if present)
-    argument char* str: the char array to be filled with the GTK info
-    --
-CAVEAT: On *BSDs and Linux distros, this function relies on the presence of 
-'detectgtk', a shell script. If it isn't present in the working directory, the GTK will be set as 'Unknown'
---
-*/
+/* detects the theme, icon(s), and font(s) associated with a GTK DE (if
+ * present) CAVEAT: On *BSDs and Linux distros, this function relies on the
+ * presence of 'detectgtk', a shell script. If it isn't present in the working
+ * directory, the GTK will be set as 'Unknown' */
 void detect_gtk(char* str)
 {
         FILE* gtk_file;
