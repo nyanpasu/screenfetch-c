@@ -423,16 +423,32 @@ char* redhat_logo[] =
 	"                                          " TNRM
 };
 
-      " TNRM,
-	""TLBL"  sooooooyhyyyyyh"TWHT"/-----"TLBL"hhhhhhhhhhhddddyssy+       " TNRM,
-	""TLBL" :yooooooyhyyyhhhyyyyyyhhhhhhhhhhdddddyssy`       " TNRM,
-	""TLBL" yoooooooyhyyhhhhhhhhhhhhhhhhhhhddddddysy/        " TNRM,
-	""TLBL"-ysooooooydhhhhhhhhhhhddddddddddddddddssy         " TNRM,
-	""TLBL" .-:/+osssyyyysyyyyyyyyyyyyyyyyyyyyyyssy:         " TNRM,
-	""TLBL"       ``.-/+oosysssssssssssssssssssssss          " TNRM,
-	""TLBL"               ``.:/+osyysssssssssssssh.          " TNRM,
-	""TLBL"                        `-:/+osyyssssyo",
-	""TLBL"                                .-:+++`" TNRM
+/* 23 */
+char* frugalware_logo[] =
+{
+	""TLBL" `++/::-.` " TNRM,
+	""TLBL" /o+++++++++/::-.` " TNRM,
+	""TLBL" `o+++++++++++++++o++/::-.` " TNRM,
+	""TLBL" /+++++++++++++++++++++++oo++/:-.`` " TNRM,
+	""TLBL" .o+ooooooooooooooooooosssssssso++oo++/:-` " TNRM,
+	""TLBL" ++osoooooooooooosssssssssssssyyo+++++++o: " TNRM,
+	""TLBL" -o+ssoooooooooooosssssssssssssyyo+++++++s` " TNRM,
+	""TLBL" o++ssoooooo++++++++++++++sssyyyyo++++++o: " TNRM,
+	""TLBL" :o++ssoooooo"TWHT"/-------------"TLBL"+syyyyyo+++++oo " TNRM,
+	""TLBL" `o+++ssoooooo"TWHT"/-----"TLBL"+++++ooosyyyyyyo++++os: " TNRM,
+	""TLBL" /o+++ssoooooo"TWHT"/-----"TLBL"ooooooosyyyyyyyo+oooss " TNRM,
+	""TLBL" .o++++ssooooos"TWHT"/------------"TLBL"syyyyyyhsosssy- " TNRM,
+	""TLBL" ++++++ssooooss"TWHT"/-----"TLBL"+++++ooyyhhhhhdssssso " TNRM,
+	""TLBL" -s+++++syssssss"TWHT"/-----"TLBL"yyhhhhhhhhhhhddssssy. " TNRM,
+	""TLBL" sooooooyhyyyyyh"TWHT"/-----"TLBL"hhhhhhhhhhhddddyssy+ " TNRM,
+	""TLBL" :yooooooyhyyyhhhyyyyyyhhhhhhhhhhdddddyssy` " TNRM,
+	""TLBL" yoooooooyhyyhhhhhhhhhhhhhhhhhhhddddddysy/ " TNRM,
+	""TLBL"-ysooooooydhhhhhhhhhhhddddddddddddddddssy " TNRM,
+	""TLBL" .-:/+osssyyyysyyyyyyyyyyyyyyyyyyyyyyssy: " TNRM,
+	""TLBL" ``.-/+oosysssssssssssssssssssssss " TNRM,
+	""TLBL" ``.:/+osyysssssssssssssh. " TNRM,
+	""TLBL" `-:/+osyyssssyo",
+	""TLBL" .-:+++`" TNRM
 };
 
 /* 19 */
