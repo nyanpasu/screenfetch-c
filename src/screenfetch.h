@@ -4,60 +4,21 @@
 #define _POSIX_C_SOURCE 200112L /* makes all these systems play nicely together */
 
 /* TODO Use an enum */
-#define UNKNOWN 0
-#define CYGWIN 1
-#define OSX 2
-#define LINUX 3
-#define FREEBSD 4
-#define NETBSD 5
-#define OPENBSD 6
-#define DFBSD 7
-#define SOLARIS 8
+enum distro_t
+{
+	UNKNOWN,
+	CYGWIN,
+	OSX,
+	LINUX,
+	FREEBSD,
+	NETBSD,
+	OPENBSD,
+	DFBSD,
+	SOLARIS
+};
 
 /* quick macro for when all BSDs have the same function syntax */
 #define ISBSD() ((OS >= 4 && OS <= 7) ? true : false)
-
-/* TODO Create platform/*.h for each platfor with appropriate
- * platform functions.
- */
-#if defined(__CYGWIN__)
-	#define OS CYGWIN
-	extern FILE* popen(const char* command, const char* type);
-	extern int pclose(FILE* stream);
-	#define WIN32_LEAN_AND_MEAN
-	#include <Windows.h>
-#elif defined(__APPLE__) && defined(__MACH__)
-	#define OS OSX
-	#include <sys/utsname.h>
-	#include <time.h>
-#elif defined(__linux__)
-	#define OS LINUX
-	#include <sys/sysinfo.h>
-	#include <sys/utsname.h>
-	#include <X11/Xlib.h>
-#elif defined(__FreeBSD__)
-	#define OS FREEBSD
-	#include <time.h>
-#elif defined(__NetBSD__)
-	#define OS NETBSD
-#elif defined(__OpenBSD__)
-	#define OS OPENBSD
-	#include <sys/utsname.h>
-	#include <time.h>
-#elif defined(__DragonFly__)
-	#define OS DFBSD
-	#include <time.h>
-#elif defined(__sun__)
-	#define OS SOLARIS
-	#include <utmpx.h>
-	#include <time.h>
-	#include <sys/types.h>
-	#include <sys/param.h>
-	#include <sys/utsname.h>
-	#include <X11/Xlib.h>
-#else 
-	#define OS UNKNOWN
-#endif
 
 
 /* color/fmt definitions */
@@ -122,8 +83,8 @@ void main_ascii_output(char* data[], char* data_names[]);
 void main_text_output(char* data[], char* data_names[]);
 char* safe_strncpy(char* destination, const char* source, size_t num); 
 void split_uptime(long uptime, int* secs, int* mins, int* hrs, int* days);
-void display_version(void);
-void display_help(void);
-void take_screenshot(void);
+void sf_display_version(void);
+void sf_display_help(void);
+void sf_take_screenshot(void);
 
 #endif /* SCREENFETCH_C_H */

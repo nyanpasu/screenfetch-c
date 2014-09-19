@@ -8,15 +8,58 @@
 #include "screenfetch.h"
 #include "detect.h"
 #include "thread.h"
+#include "version.h"
 
-static const char* screenfetch_unknown = "Unknown";
+/* TODO Create platform/*.h for each platfor with appropriate
+ * platform functions.
+ */
+#if defined(__CYGWIN__)
+	#define OS CYGWIN
+	extern FILE* popen(const char* command, const char* type);
+	extern int pclose(FILE* stream);
+	#define WIN32_LEAN_AND_MEAN
+	#include <Windows.h>
+#elif defined(__APPLE__) && defined(__MACH__)
+	#define OS OSX
+	#include <sys/utsname.h>
+	#include <time.h>
+#elif defined(__linux__)
+	#define OS LINUX
+	#include <sys/sysinfo.h>
+	#include <sys/utsname.h>
+	#include <X11/Xlib.h>
+#elif defined(__FreeBSD__)
+	#define OS FREEBSD
+	#include <time.h>
+#elif defined(__NetBSD__)
+	#define OS NETBSD
+#elif defined(__OpenBSD__)
+	#define OS OPENBSD
+	#include <sys/utsname.h>
+	#include <time.h>
+#elif defined(__DragonFly__)
+	#define OS DFBSD
+	#include <time.h>
+#elif defined(__sun__)
+	#define OS SOLARIS
+	#include <utmpx.h>
+	#include <time.h>
+	#include <sys/types.h>
+	#include <sys/param.h>
+	#include <sys/utsname.h>
+	#include <X11/Xlib.h>
+#else 
+	#define OS UNKNOWN
+#endif
 
 /* other definitions */
-bool manual = false;
-bool logo = true;
-bool error = true;
-bool verbose = false;
-bool screenshot = false;
+static bool manual = false;
+static bool logo = true;
+static bool error = true;
+static bool verbose = false;
+static bool screenshot = false;
+
+static const char* screenfetch_unknown = "Unknown";
 
 int main(int argc, char** argv)
 {
@@ -49,16 +92,16 @@ int main(int argc, char** argv)
 
         struct option long_options[] =
         {
-                {"manual", no_argument, 0, 'm'},
-                {"verbose", no_argument, 0, 'v'},
-                {"no-logo", no_argument, 0, 'n'},
-                {"screenshot", no_argument, 0, 's'},
-                {"distro", required_argument, 0, 'D'},
-                {"suppress-errors", no_argument, 0, 'E'},
-                {"version", no_argument, 0, 'V'},
-                {"help", no_argument, 0, 'h'},
-                {"logo-only", required_argument, 0, 'L'},
-                {0, 0, 0, 0}
+                {"manual"          , no_argument      , 0, 'm'},
+                {"verbose"         , no_argument      , 0, 'v'},
+                {"no-logo"         , no_argument      , 0, 'n'},
+                {"screenshot"      , no_argument      , 0, 's'},
+                {"distro"          , required_argument, 0, 'D'},
+                {"suppress-errors" , no_argument      , 0, 'E'},
+                {"version"         , no_argument      , 0, 'V'},
+                {"help"            , no_argument      , 0, 'h'},
+                {"logo-only"       , required_argument, 0, 'L'},
+                { }
         };
 
         /* TOOO Move these characters to the scope of the loop. */
@@ -184,19 +227,16 @@ void main_text_output(char* data[], char* data_names[])
         return;
 }
 
-/*  display_version
-    called if the -v flag is tripped, outputs the current version of screenfetch-c
-    */
-void display_version(void)
+void sf_display_version(void)
 {
-        printf("%s\n", "screenfetch-c - Version 1.2, revision 3");
+        printf("%Screenfetch %d.%d.%d\n", SCREENFETCH_VERSION_MAJOR, SCREENFETCH_VERSION_MINOR, SCREENFETCH_VERSION_REVISION);
         return;
 }
 
 /*  display_help
     called if the -h flag is tripped, tells the user where to find the manpage
     */
-void display_help(void)
+void sf_display_help(void)
 {
         printf("%s\n", "screenfetch-c");
         printf("%s\n", "A rewrite of screenFetch, the popular shell script, in C.");
@@ -213,7 +253,7 @@ void display_help(void)
 CAVEAT: THIS FUNCTION MAKES SYSTEM CALLS
 --
 */
-void take_screenshot(void)
+void sf_take_screenshot(void)
 {
         printf("%s", "Taking shot in 3..");
         fflush(stdout);
