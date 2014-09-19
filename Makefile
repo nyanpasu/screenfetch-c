@@ -34,26 +34,12 @@ win:
 
 install:
 	$(INSTALL) screenfetch-c $(BINDIR)/screenfetch-c
-	$(INSTALL) ./src/detectde $(BINDIR)/detectde
-	$(INSTALL) ./src/detectgtk $(BINDIR)/detectgtk
-	$(INSTALL) ./src/detectwm $(BINDIR)/detectwm
-	$(INSTALL) ./src/detectwmtheme $(BINDIR)/detectwmtheme
-	$(INSTALL) ./src/detectgpu $(BINDIR)/detectgpu
 	mkdir -p $(MANDIR)
 	$(INSTALL) ./manpage/screenfetch-c.1 $(MANDIR)/screenfetch-c.1
 
 uninstall:
 	rm -rf $(BINDIR)/screenfetch-c
-	rm -rf $(BINDIR)/detectde
-	rm -rf $(BINDIR)/detectgtk
-	rm -rf $(BINDIR)/detectwm
-	rm -rf $(BINDIR)/detectwmtheme
-	rm -rf $(BINDIR)/detectgpu
 	rm -rf $(MANDIR)/screenfetch-c.1
-
-threadtest:
-	$(CC) $(CFLAGS) ./src/threadtest.c ./src/thread.c -o ./threadtest
 
 clean:
 	rm screenfetch-c
-
